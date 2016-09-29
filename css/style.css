@@ -111,6 +111,25 @@
 		margin-bottom: 2em !important;
 	}
 
+	.social_buttons {
+		text-align: center;
+	}
+
+	.twitter_button {
+		margin-right: 5px;
+	}
+
+	.facebook_button {
+		vertical-align:top;
+		zoom:1;
+		*display:inline-bottom;
+	}
+
+	.fb-share-button {
+		display: inline;
+	}
+
+
 	a {
 		color: #007cb3;
 		text-decoration: none;
