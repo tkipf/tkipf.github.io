@@ -120,7 +120,7 @@
 	}
 
 	.facebook_button {
-		vertical-align:top;
+		vertical-align: top !important;
 		zoom:1;
 		*display:inline-bottom;
 	}
