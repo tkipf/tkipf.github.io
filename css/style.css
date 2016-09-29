@@ -119,9 +119,14 @@
 		margin-right: 5px;
 	}
 
+	.fb-share-button {
+		display: inline;
+	}
+
 	.fb-share-button span {
 	   top: -6px;
 	}
+
 
 
 	a {
