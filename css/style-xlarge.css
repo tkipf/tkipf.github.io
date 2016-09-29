@@ -9,3 +9,7 @@
 	body, input, select, textarea {
 		font-size: 11pt;
 	}
+
+	.blog {
+		padding: 0 !important;
+	}

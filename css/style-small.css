@@ -14,6 +14,12 @@
 		margin-bottom: 2em;
 	}
 
+	.blog {
+	  font-size: 12pt !important;
+			padding: 0 !important;
+	}
+
+
 /* Image */
 
 	.image.captioned {

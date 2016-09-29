@@ -18,6 +18,11 @@
 		font-size: 1.75em;
 	}
 
+	.blog {
+	  font-size: 12pt !important;
+			padding: 0 !important;
+	}
+
 /* List */
 
 	ul.actions {

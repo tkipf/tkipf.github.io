@@ -22,6 +22,11 @@
 			font-size: 1.3em;
 		}
 
+		.blog {
+			padding: 0 !important;
+		}
+
+
 /* Feature */
 
 	.feature-grid .feature {
