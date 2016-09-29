@@ -6,16 +6,14 @@
 -->
 <html>
 	<head>
-		<title>Graph Convolutional Networks - Thomas Kipf, 30 September 2016</title>
+		<title>Graph Convolutional Networks</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="title" content="Graph Convolutional Networks - Thomas Kipf, 30 September 2016" />
-		<meta property="og:title" content="Graph Convolutional Networks - Thomas Kipf, 30 September 2016" />
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<noscript>
-			<link rel="stylesheet" href="css/style.css" />
-			<link rel="stylesheet" href="css/skel.css" />
-			<link rel="stylesheet" href="css/style-xlarge.css" />
+			<link rel="stylesheet" href="../css/style.css" />
+			<link rel="stylesheet" href="../css/skel.css" />
+			<link rel="stylesheet" href="../css/style-xlarge.css" />
 		</noscript>
 		<link rel="stylesheet" type="text/css"
 		href="https://fonts.googleapis.com/css?family=Raleway:400,700">
@@ -23,10 +21,10 @@
 		href="https://fonts.googleapis.com/css?family=Open+Sans">
 		<link rel="stylesheet" href="css/font-awesome.min.css">
 		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><![endif]-->
-		<script src="js/jquery.min.js"></script>
-		<script src="js/skel.min.js"></script>
-		<script src="js/skel-layers.min.js"></script>
-		<script src="js/init.js"></script>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/skel.min.js"></script>
+		<script src="../js/skel-layers.min.js"></script>
+		<script src="../js/init.js"></script>
 		<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 		<script>
 			$(document).ready(function(){
@@ -71,10 +69,10 @@
 				</ul>
 				<nav id="nav">
 					<ul>
-						<li><a href="index.html">Home</a></li>
-						<li><a href="index.html#two">Projects</a></li>
-						<li><a href="blog_gcn/" class="active">Blog</a></li>
-						<li><a href="blog/index.html#footer">Contact</a></li>
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="../index.html#two">Projects</a></li>
+						<li><a href="index.html" class="active">Blog</a></li>
+						<li><a href="index.html#footer">Contact</a></li>
 					</ul>
 				</nav>
 			</header>
@@ -88,7 +86,7 @@
 						</header>
 						<div class="align-left blog">
 							<div class="figure">
-							<img src="images/blog/gcn_web.png" alt="Multi-layer Graph Convolutional Network (GCN) with first-order filters." />
+							<img src="blog_gcn/images/gcn_web.png" alt="Multi-layer Graph Convolutional Network (GCN) with first-order filters." />
 							<p class="caption">Multi-layer Graph Convolutional Network (GCN) with first-order filters.</p>
 							<div class="social_buttons">
 							<span class="twitter_button"><a href="https://twitter.com/share" class="twitter-share-button" data-text="How powerful are Graph Convolutional Networks? - An introduction to neural networks on graphs" data-url="http://tkipf.github.io/blog_gcn.html" data-via="thomaskipf" data-lang="en" data-show-count="false">Tweet</a></span>
@@ -137,13 +135,13 @@
 							<p>In the next section, we will take a closer look on how this type of model operates on a very simple example graph: Zachary's karate club network (make sure to check out the <a href="https://en.wikipedia.org/wiki/Zachary%27s_karate_club">Wikipedia article</a>!).</p>
 							<h4 id="gcns-part-iii-embedding-the-karate-club-network">GCNs Part III: Embedding the karate club network</h4>
 							<div class="figure">
-							<img src="images/blog/karate.png" alt="Karate club graph, colors denote communities obtained via modularity-based clustering (Brandes et al., 2008)." />
+							<img src="blog_gcn/images/karate.png" alt="Karate club graph, colors denote communities obtained via modularity-based clustering (Brandes et al., 2008)." />
 							<p class="caption">Karate club graph, colors denote communities obtained via modularity-based clustering (<a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.68.6623">Brandes et al.</a>, 2008).</p>
 							</div>
 							<p>Let's take a look at how our simple GCN model (see previous section or <a href="http://arxiv.org/abs/1609.02907">Kipf &amp; Welling</a>, 2016) works on a well-known graph dataset: Zachary's karate club network (see Figure above).</p>
 							<p>We take a 3-layer GCN with randomly initialized weights. Now, even before training the weights, we simply insert the adjacency matrix of the graph and <span class="math inline">\(X = I\)</span> (i.e. the identity matrix, as we don't have any node features) into the model. The 3-layer GCN now performs three propagation steps during the forward pass and effectively convolves the 3rd-order neighborhood of every node (all nodes up to 3 &quot;hops&quot; away). Remarkably, the model produces an embedding of these nodes that closely resembles the community-structure of the graph (see Figure below). Remember that we have initialized the weights completely at random and have not yet performed any training updates (so far)!</p>
 							<div class="figure">
-							<img src="images/blog/karate_emb.png" alt="GCN embedding (with random weights) for nodes in the karate club network." />
+							<img src="blog_gcn/images/karate_emb.png" alt="GCN embedding (with random weights) for nodes in the karate club network." />
 							<p class="caption">GCN embedding (with random weights) for nodes in the karate club network.</p>
 							</div>
 							<p>This might seem somewhat surprising. A recent paper on a model called DeepWalk (<a href="https://arxiv.org/abs/1403.6652">Perozzi et al.</a>, KDD 2014) showed that they can learn a very similar embedding in a complicated unsupervised training procedure. How is it possible to get such an embedding more or less &quot;for free&quot; using our simple untrained GCN model?</p>
@@ -161,8 +159,8 @@
 							<h4 id="gcns-part-iv-semi-supervised-learning">GCNs Part IV: Semi-supervised learning</h4>
 							<p>Since everything in our model is differentiable and parameterized, we can add some labels, train the model and observe how the embeddings react. We can use the semi-supervised learning algorithm for GCNs introduced in <a href="http://arxiv.org/abs/1609.02907">Kipf &amp; Welling</a> (2016). We simply label one node per class/community (highlighted nodes in the video below) and start training for a couple of iterations<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>:</p>
 							<div class="figure">
-							<div class="video"><video width='640' preload='auto' muted controls poster='images/blog/video_.png'>
-								<source src='images/blog/video.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/></video>
+							<div class="video"><video width='640' preload='auto' muted controls poster='blog_gcn/images/video_.png'>
+								<source src='blog_gcn/images/video.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/></video>
 							</div>
 							<p class="caption">Semi-supervised classification with GCNs: Latent space dynamics for 300 training iterations with a single label per class. Labeled nodes are highlighted.</p>
 							</div>
@@ -216,8 +214,8 @@ var disqus_config = function () {
 
 							<!--
 							<div class="figure">
-							<div class="video"><video width='640' preload='auto' muted controls poster='images/blog/video_.png'>
-								<source src='images/blog/video.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/></video>
+							<div class="video"><video width='640' preload='auto' muted controls poster='blog_gcn/images/video_.png'>
+								<source src='blog_gcn/images/video.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'/></video>
 							</div>
 							<p class="caption">Semi-supervised classification with GCNs: Latent space dynamics for 300 training iterations with a single label per class. Labeled nodes are highlighted.</p>
 							</div>
