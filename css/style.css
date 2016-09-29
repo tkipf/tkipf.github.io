@@ -119,11 +119,8 @@
 		margin-right: 5px;
 	}
 
-	.fb-share-button {
-		vertical-align: top !important;
-		zoom:1;
-		*display:inline-bottom;
-		display: inline;
+	.fb-share-button span {
+	   top: -6px;
 	}
 
 
