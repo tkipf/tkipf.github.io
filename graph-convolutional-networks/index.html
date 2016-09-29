@@ -6,13 +6,13 @@
 -->
 <html>
 	<head>
-		<title>How powerful are Graph Convolutional Networks?</title>
+		<title>Unterstanding Graph Convolutional Networks</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<meta name="twitter:card" content="summary_large_image">
 		<meta name="twitter:site" content="@thomaskipf">
-		<meta name="twitter:title" content="How powerful are Graph Convolutional Networks?">
+		<meta name="twitter:title" content="Unterstanding Graph Convolutional Networks">
 		<meta name="twitter:description" content="Many important real-world datasets come in the form of graphs or networks: social networks, knowledge graphs, protein-interaction networks, the World Wide Web, etc. (just to name a few). Yet, until recently, very little attention has been devoted to the generalization of neural...">
 		<meta name="twitter:creator" content="@thomaskipf">
 		<meta name="twitter:domain" content="http://tkipf.github.io/">
@@ -117,7 +117,7 @@
 							<li>GCNs as differentiable generalization of the <em>Weisfeiler-Lehman</em> algorithm</li>
 							</ul>
 							<p>If you're already familiar with GCNs and related methods, you might want to jump directly to <a href="#embedding-the-karate-club-network">Embedding the karate club network</a>.</p>
-							<h3 id="how-powerful-are-graph-convolutions">How powerful are Graph Convolutional Networks?</h3>
+							<h3 id="how-powerful-are-graph-convolutions">Unterstanding Graph Convolutional Networks</h3>
 							<h4 id="recent-literature">Recent literature</h4>
 							<p>Generalizing well-established neural models like RNNs or CNNs to work on arbitrarily structured graphs is a challenging problem. Some recent papers introduce problem-specific specialized architectures (e.g. <a target="_blank" href="http://papers.nips.cc/paper/5954-convolutional-networks-on-graphs-for-learning-molecular-fingerprints">Duvenaud et al.</a>, NIPS 2015; <a target="_blank" href="https://arxiv.org/abs/1511.05493">Li et al.</a>, ICLR 2016), others make use of graph convolutions known from spectral graph theory<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> (<a target="_blank" href="http://arxiv.org/abs/1312.6203">Bruna et al.</a>, ICLR 2014; <a target="_blank" href="http://arxiv.org/abs/1506.05163">Henaff et al.</a>, 2015) to define parameterized filters that are used in a multi-layer neural network model, akin to &quot;classical&quot; CNNs that we know and love.</p>
 							<p>More recent work focuses on bridging the gap between fast heuristics and the slow<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, but somewhat more principled, spectral approach. <a target="_blank" href="https://arxiv.org/abs/1606.09375">Defferrard et al.</a> (NIPS 2016) approximate smooth filters in the spectral domain using Chebyshev polynomials with free parameters that are learned in a neural network-like model. They achieve convicing results on regular domains (like MNIST), closely approaching those of a simple 2D CNN model.</p>
