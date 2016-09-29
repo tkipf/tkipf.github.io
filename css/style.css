@@ -116,7 +116,15 @@
 	}
 
 	.twitter_button {
-		margin-right: 5px;
+		padding-right: 4px;
+		min-width: 90px;
+  	min-height: 20px;
+	}
+
+	.facebook_button {
+		padding-right: 4px;
+		min-width: 90px;
+  	min-height: 20px;
 	}
 
 	.fb-share-button {
@@ -124,7 +132,7 @@
 	}
 
 	.fb-share-button span {
-	   top: -6px;
+	  /* top: -6px; */
 	}
 
 
