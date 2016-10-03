@@ -40,7 +40,7 @@
 	/* Twitter share button */
 	.osc-counter {
 		color: #333 !important;
-		box-shadow: 0 !important;
+		box-shadow: none !important;
 	}
 
 	.blog .video {
