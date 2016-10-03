@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Graph Convolutional Networks</title>
+		<title>Graph Convolutional Networks | Thomas Kipf | PhD Student @ Univ. of Amsterdam</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
@@ -97,7 +97,7 @@
 			</header>
 
 			<!-- One -->
-				<section id="one" class="wrapper style1 special">
+				<section id="one" class="wrapper style1 special blogwrapper">
 					<div class="container 75%">
 						<header class="major blogheader">
 							<h2>Graph Convolutional Networks</h2>
@@ -215,7 +215,7 @@
 							<li id="fn1"><p>A spectral graph convolution is defined as the multiplication of a signal with a filter in the Fourier space of a graph. A graph Fourier transform is defined as the multiplication of a graph signal <span class="math inline">\(X\)</span> (i.e. feature vectors for every node) with the eigenvector matrix <span class="math inline">\(U\)</span> of the graph Laplacian <span class="math inline">\(L\)</span>. The (normalized) graph Laplacian can be easily computed from the symmetrically normalized graph adjacency matrix <span class="math inline">\(\tilde{A}\)</span>: <span class="math inline">\(L = I - \tilde{A}\)</span>.<a href="#fnref1">↩</a></p></li>
 							<li id="fn2"><p>Using a spectral approach comes at a price: Filters have to be defined in Fourier space and a graph Fourier transform is expensive to compute (it requires multiplication of node features with the eigenvector matrix of the graph Laplacian, which is a <span class="math inline">\(O(N^2)\)</span> operation for a graph with <span class="math inline">\(N\)</span> nodes; computing the eigenvector matrix in the first place is even more expensive).<a href="#fnref2">↩</a></p></li>
 							<li id="fn3"><p>I'm simplifying things here. For an extensive mathematical discussion of the Weisfeiler-Lehman algorithm, have a look at the paper by <a target="_blank" href="https://arxiv.org/abs/1101.5211">Douglas</a> (2011).<a href="#fnref3">↩</a></p></li>
-							<li id="fn4"><p>Node features for the Weisfeiler-Lehman are typically chosen as scalar integers and are often referred to as colors.<a href="#fnref4">↩</a></p></li>
+							<li id="fn4"><p>Node features for the Weisfeiler-Lehman algorithm are typically chosen as scalar integers and are often referred to as colors.<a href="#fnref4">↩</a></p></li>
 							<li id="fn5"><p>As we don't anneal the learning rate in this example, things become quite &quot;jiggly&quot; once the model has converged to a good solution.<a href="#fnref5">↩</a></p></li>
 							</ol>
 							</div>
