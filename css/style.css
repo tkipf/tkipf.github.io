@@ -36,6 +36,13 @@
 		line-height: 2em;
 	}
 
+
+	/* Twitter share button */
+	.osc-counter {
+		color: #333 !important;
+		box-shadow: 0 !important;
+	}
+
 	.blog .video {
 		text-align: center;
 		margin: 0 auto;
