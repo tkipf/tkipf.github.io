@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description"
+          content="Conditional Object-Centric Learning from Video">
+    <meta name="author"
+          content="Thomas Kipf, Gamaleldin F. Elsayed, Aravindh Mahendran*, Austin Stone, Sara Sabour, Georg Heigold, Rico Jonschkowski, Alexey Dosovitskiy, Klaus Greff">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+          crossorigin="anonymous">
+    <title>Conditional Object-Centric Learning from Video</title>
+    <style>
+      h2 {
+        text-align: center;
+      }
+      .paper-title {
+        margin-top: 2em;
+        margin-bottom: 2em;
+      }
+      .authors-list .name {
+        font-size: 1.2em;
+        margin-bottom: 0.5em;
+      }
+      .paper-link a {
+        font-size: 1em;
+      }
+      .neg-space {
+        margin-top: -1.3em;
+      }
+      .teaser-video::before {
+        padding-top: 15%;
+      }
+      .teaser-video {
+        padding-left: 5%;
+        padding-right: 5%;
+        margin-bottom: 2em;
+      }
+      .sketchy-video::before {
+        padding-top: 70%;
+      }
+      .cater-video::before {
+        padding-top: 22%;
+      }
+      .movi-video::before {
+        padding-top: 15%;
+      }
+      .content-block {
+        padding-left: .5em;
+        padding-right: .5em;
+        padding-bottom: 2em;
+      }
+      .citation .description {
+        font-family: "Courier", monospace;
+        font-size: 16px;
+        white-space: pre;
+        text-align: left;
+        padding-left: 10%;
+      }
+      .footnote {
+        background-color: #e9ecef;
+        padding-top: 1em;
+        padding-bottom: 1em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="jumbotron jumbotron-fluid overflow-auto">
+
+      <!-- Title -->
+      <div class="paper-title">
+        <h1 class="name text-center">Conditional Object-Centric Learning from Video</h1>
+      </div>
+
+      <!-- Authors -->
+      <div class="authors-list">
+        <p class="name text-center">
+          <a href="http://tkipf.github.io/" target="_blank">Thomas Kipf</a>*,
+          <a href="http://www.columbia.edu/~gfa2109/" target="_blank">Gamaleldin F. Elsayed</a>*,
+          <a href="https://aravindhm.github.io/" target="_blank">Aravindh Mahendran</a>*,
+          <a href="https://scholar.google.com/citations?user=IU4ZllQAAAAJ" target="_blank">Austin Stone</a>*,<br />
+          <a href="https://scholar.google.ca/citations?user=l8wQ39EAAAAJ" target="_blank">Sara Sabour</a>,
+          <a href="https://research.google/people/GeorgHeigold/" target="_blank">Georg Heigold</a>,
+          <a href="http://ricojonschkowski.com/" target="_blank">Rico Jonschkowski</a>,
+          <a href="https://scholar.google.de/citations?user=FXNJRDoAAAAJ" target="_blank">Alexey Dosovitskiy</a>,
+          <a href="https://qwlouse.github.io/" target="_blank">Klaus Greff</a><br />
+          Google Research
+        </p>
+        <p class="text-center text-secondary">*equal contribution</p>
+      </div>
+
+      <!-- Paper link -->
+      <div class="paper-link">
+        <p class="text-center">
+          <a class="btn btn-primary" href="#">Paper</a>
+          <a class="btn btn-secondary disabled" href="#" aria-disabled="true">Code (coming soon)</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col embed-responsive teaser-video">
+          <video autoplay muted loop>
+            <source src="figures/teaser_video.mp4" type="video/mp4">
+            Sorry, your browser doesn't support embedded videos.
+          </video>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p class="text-center text-secondary neg-space"><i>Figure</i>: SAVi decomposes videos into objects using only simple cues, such as bounding boxes, in the first frame of the video.</p>
+        </div>
+      </div>
+
+
+      <div class="content-block">
+        <div class="row">
+          <div class="col">
+            <p class="description">
+              Object-centric representations are a promising path toward more systematic generalization by providing flexible abstractions upon which compositional world models can be built.
+              Recent work on simple 2D and 3D datasets has shown that models with object-centric inductive biases can learn to segment and represent meaningful objects from the statistical structure of the data alone without the need for any supervision.
+              However, such fully-unsupervised methods still fail to scale to diverse realistic data, despite the use of increasingly complex inductive biases such as priors for the size of objects or the 3D geometry of the scene.
+            </p>
+            <p class="description">
+              In this work, we instead take a weakly-supervised approach and focus on how 1) using the temporal dynamics of video data in the form of optical flow and 2) conditioning the model on simple object location cues can be used to enable segmenting and tracking objects in significantly more realistic synthetic data.
+            </p>
+            <p class="description">
+              We introduce a sequential extension to <a href="https://arxiv.org/abs/2006.15055" target="_blank">Slot Attention</a> &mdash; <b>Slot Attention for Video (SAVi)</b> &mdash; which we train to predict frame reconstructions or optical flow and show that <i>conditioning the initial state of this model on a small set of hints, such as center of mass of objects in the first frame</i>, is sufficient to significantly improve instance segmentation.
+              These benefits generalize beyond the training distribution to novel objects, novel backgrounds, and to longer video sequences.
+              We also find that such initial-state-conditioning can be used during inference as a flexible interface to query the model for specific objects or parts of objects, which could pave the way for a range of weakly-supervised approaches and allow more effective interaction with trained models.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block">
+        <div class="row">
+          <div class="col">
+            <h2>Fully-unsupervised video decomposition</h2>
+            <hr />
+            <p class="description">
+              Even without conditioning on external cues, such as bounding boxes of objects in the first frame, SAVi is able to decompose dynamic scenes with simple textures (including real-world data, such as the <a href="https://sites.google.com/view/data-driven-robotics/" target="_blank">Sketchy</a> dataset). In this fully-unsupervised setup, we train SAVi to reconstruct frames of the input. Each slot in SAVi (as indicated by color) learns to represent one object, one independently moving part of an object, or the background.
+            </p>
+          </div>
+        </div>
+        <div class="row">
+
+          <div class="col-md">
+            <div class="row">
+              <div class="col embed-responsive sketchy-video">
+                <video autoplay muted loop>
+                  <source src="figures/sketchy_1.mp4" type="video/mp4">
+                  Sorry, your browser doesn't support embedded videos.
+                </video>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <p class="text-center text-secondary"><i>Figure</i>: Unsupervised SAVi on <a href="https://sites.google.com/view/data-driven-robotics/" target="_blank">Sketchy</a>.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md">
+            <div class="row">
+              <div class="col embed-responsive sketchy-video">
+                <video autoplay muted loop>
+                  <source src="figures/sketchy_2.mp4" type="video/mp4">
+                  Sorry, your browser doesn't support embedded videos.
+                </video>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <p class="text-center text-secondary"><i>Figure</i>: Unsupervised SAVi on <a href="https://sites.google.com/view/data-driven-robotics/" target="_blank">Sketchy</a>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col embed-responsive cater-video">
+            <video autoplay muted loop>
+              <source src="figures/cater.mp4" type="video/mp4">
+              Sorry, your browser doesn't support embedded videos.
+            </video>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <p class="text-center text-secondary"><i>Figure</i>: Per-slot reconstructions of unsupervised SAVi on <a href="https://rohitgirdhar.github.io/CATER/" target="_blank">CATER</a>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block">
+        <div class="row">
+          <div class="col">
+            <h2>Conditional video decomposition</h2>
+            <hr />
+            <p class="description">
+              To bridge the gap to more complex visual scenes, where decomposition into objects/parts can often be ambiguous, we introduce two additional weak training signals: 1) we use optical flow (i.e. information about the motion of individual pixels) as a training target and 2) we condition the initial slot representations of SAVi on external cues, such as bounding boxes (or even just the coordinates of a single point on an object), for the first video frame. This form of conditioning further serves as a convenient interface to query the model about objects at test time.
+            </p>
+
+            <p class="description">
+              Object segmentation and tracking naturally emerges in this setting, even though SAVi is not explicitly trained for this task. This allows SAVi to decompose videos of much higher visual complexity than prior methods without using per-object segmentation labels. These benefits further generalize to settings where optical flow is provided by an unsupervised flow estimation model.
+          </p>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="content-block">
+        <div class="row">
+          <div class="col embed-responsive movi-video">
+            <video autoplay muted loop>
+              <source src="figures/movi_flow.mp4" type="video/mp4">
+              Sorry, your browser doesn't support embedded videos.
+            </video>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <p class="text-center text-secondary"><i>Figure</i>: Video decomposition with SAVi conditioned on bounding boxes in the first frame.</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col embed-responsive movi-video">
+            <video autoplay muted loop>
+              <source src="figures/movi_1.mp4" type="video/mp4">
+              Sorry, your browser doesn't support embedded videos.
+            </video>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col embed-responsive movi-video">
+            <video autoplay muted loop>
+              <source src="figures/movi_2.mp4" type="video/mp4">
+              Sorry, your browser doesn't support embedded videos.
+            </video>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col embed-responsive movi-video">
+            <video autoplay muted loop>
+              <source src="figures/movi_3.mp4" type="video/mp4">
+              Sorry, your browser doesn't support embedded videos.
+            </video>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <p class="text-center text-secondary"><i>Figure</i>: Video decomposition with SAVi conditioned on bounding boxes in the first frame.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="content-block">
+        <div class="row">
+          <div class="col">
+            <h2>Steerable part-whole decomposition</h2>
+            <hr />
+            <p class="description">
+              Object discovery is inherently ambiguous and context-dependent. Conditioning on additional contextual information allows SAVi to resolve these ambiguities and decompose scenes at the desired level of granularity (despite never being explicitly trained to do so). In the example below, we show anecdotal evidence that by conditioning at the level of parts during inference the model can in fact successfully segment and track the corresponding parts. The model attends to either both <i>green fist</i> with a single slot or to each individual fist with a separate slot, depending on the granularity of the conditioning signal.
+            </p>
+            <p class="text-center"><img src="figures/part_whole.png" class="img-fluid" alt="Part-whole segmentation" /></p>
+            <p class="text-center text-secondary"><i>Figure</i>: Visualization of SAVi attention masks for part vs. whole conditioning.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Citation -->
+      <div class="content-block citation">
+        <div class="row">
+          <div class="col">
+            <h2>Reference</h2>
+            <hr />
+            <p class="text-center">
+              <a class="btn btn-primary" href="#">Paper</a>
+              <a class="btn btn-secondary disabled" href="#" aria-disabled="true">Code (coming soon)</a>
+            </p>
+            <p class="description overflow-auto">@article{kipf2021conditional,
+    author = {Kipf, Thomas
+              and Elsayed, Gamaleldin F.
+              and Mahendran, Aravindh
+              and Stone, Austin
+              and Sabour, Sara
+              and Duckworth, Daniel
+              and Heigold, Georg
+              and Jonschkowski, Rico
+              and Dosovitskiy, Alexey
+              and Greff, Klaus},
+    title = {{Conditional Object-Centric Learning from Video}},
+    journal = {arXiv preprint arXiv:TODO},
+    year  = {2021}
+}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      <div class="container">
+        <p>For questions / comments, reach out to: <a href="mailto:tkipf@google.com">Thomas Kipf</a></p>
+      </div>
+    </div>
+
+    <!-- Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
+  </body>
+</html>
