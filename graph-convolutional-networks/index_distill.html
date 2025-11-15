@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://distill.pub/template.v2.js"></script>
+	<style>
+		/* Custom styles for better spacing if needed, though Distill handles most */
+		d-article {
+			border-top: 1px solid rgba(0, 0, 0, 0.1);
+			padding-top: 2rem;
+		}
+	</style>
+</head>
+
+<body>
+
+	<d-front-matter>
+		<script type="text/json">{
+    "title": "Graph Convolutional Networks",
+    "description": "How powerful are Graph Convolutional Networks?",
+    "authors": [
+      {
+        "author": "Thomas Kipf",
+        "authorURL": "https://tkipf.github.io",
+        "affiliation": "University of Amsterdam",
+        "affiliationURL": "https://www.uva.nl/en"
+      }
+    ],
+    "katex": {
+      "delimiters": [
+        {"left": "$$", "right": "$$", "display": true},
+        {"left": "$", "right": "$", "display": false}
+      ]
+    },
+    "publishedDate": "2016-09-30T12:00:00.000Z"
+  }</script>
+	</d-front-matter>
+
+	<d-title>
+		<h1>Graph Convolutional Networks</h1>
+	</d-title>
+
+	<d-byline></d-byline>
+
+	<d-article>
+		<p>Many important real-world datasets come in the form of graphs or networks: social networks, knowledge graphs,
+			protein-interaction networks, the World Wide Web, etc. (just to name a few). Yet, until recently, very little
+			attention has been devoted to the generalization of neural network models to such structured datasets.</p>
+		<p>In the last couple of years, a number of papers re-visited this problem of generalizing neural networks to work
+			on
+			arbitrarily structured graphs <d-cite key="bruna2013spectral"></d-cite> <d-cite key="henaff2015deep"></d-cite>
+			<d-cite key="duvenaud2015convolutional"></d-cite> <d-cite key="li2015gated"></d-cite> <d-cite
+				key="defferrard2016convolutional"></d-cite> <d-cite key="kipf2016semi"></d-cite>, some of them now achieving
+			very
+			promising results in domains that have previously been dominated by, e.g., kernel-based methods, graph-based
+			regularization techniques and others.
+		</p>
+
+		<p>In this post, I will give a brief overview of recent developments in this field and point out strengths and
+			drawbacks
+			of various approaches. The discussion here will mainly focus on two recent papers:</p>
+
+		<ul>
+			<li>Kipf & Welling (ICLR 2017), <a href="http://arxiv.org/abs/1609.02907" target="_blank">Semi-Supervised
+					Classification
+					with Graph Convolutional Networks</a> (disclaimer: I'm the first author)</li>
+			<li>Defferrard et al. (NIPS 2016), <a href="https://arxiv.org/abs/1606.09375" target="_blank">Convolutional Neural
+					Networks on Graphs with Fast Localized Spectral Filtering</a></li>
+		</ul>
+		<p>and a review/discussion post by Ferenc Huszar: <a
+				href="http://www.inference.vc/how-powerful-are-graph-convolutions-review-of-kipf-welling-2016-2/"
+				target="_blank">How powerful are Graph Convolutions?</a> that discusses some limitations of these kinds of
+			models. I
+			wrote a short comment on Ferenc's review <a href="#the-issue-with-regular-graphs">here</a> (at the very end of
+			this
+			post).</p>
+
+		<h3>Outline</h3>
+		<ul>
+			<li>Short introduction to neural network models on graphs</li>
+			<li>Spectral graph convolutions and <em>Graph Convolutional Networks</em> (GCNs)</li>
+			<li>Demo: Graph embeddings with a simple 1st-order GCN model</li>
+			<li>GCNs as differentiable generalization of the <em>Weisfeiler-Lehman</em> algorithm</li>
+		</ul>
+		<p>If you're already familiar with GCNs and related methods, you might want to jump directly to <a
+				href="#embedding-the-karate-club-network">Embedding the karate club network</a>.</p>
+
+		<h3>How powerful are Graph Convolutional Networks?</h3>
+
+		<h4>Recent literature</h4>
+		<p>Generalizing well-established neural models like RNNs or CNNs to work on arbitrarily structured graphs is a
+			challenging problem. Some recent papers introduce problem-specific specialized architectures (e.g. <d-cite
+				key="duvenaud2015convolutional"></d-cite>, <d-cite key="li2015gated"></d-cite>, <d-cite
+				key="jain2016structural"></d-cite>), others make use of graph convolutions known from spectral graph
+			theory<d-footnote>A spectral graph convolution is defined as the multiplication of a signal with a filter in the
+				Fourier space of a graph. A graph Fourier transform is defined as the multiplication of a graph signal $X$ (i.e.
+				feature vectors for every node) with the eigenvector matrix $U$ of the graph Laplacian $L$. The (normalized)
+				graph
+				Laplacian can be easily computed from the symmetrically normalized graph adjacency matrix $\tilde{A}$: $L = I -
+				\tilde{A}$.</d-footnote> (<d-cite key="bruna2013spectral"></d-cite>, <d-cite key="henaff2015deep"></d-cite>) to
+			define parameterized filters that are used in a multi-layer neural network model, akin to "classical" CNNs that we
+			know and love.</p>
+
+		<p>More recent work focuses on bridging the gap between fast heuristics and the slow<d-footnote>Using a spectral
+				approach comes at a price: Filters have to be defined in Fourier space and a graph Fourier transform is
+				expensive to
+				compute (it requires multiplication of node features with the eigenvector matrix of the graph Laplacian, which
+				is a
+				$O(N^2)$ operation for a graph with $N$ nodes; computing the eigenvector matrix in the first place is even more
+				expensive).</d-footnote>, but somewhat more principled, spectral approach. <d-cite
+				key="defferrard2016convolutional"></d-cite> approximate smooth filters in the spectral domain using Chebyshev
+			polynomials with free parameters that are learned in a neural network-like model. They achieve convincing results
+			on
+			regular domains (like MNIST), closely approaching those of a simple 2D CNN model.</p>
+
+		<p>In <d-cite key="kipf2016semi"></d-cite>, we take a somewhat similar approach and start from the framework of
+			spectral
+			graph convolutions, yet introduce simplifications (we will get to those later in the post) that in many cases
+			allow
+			both for significantly faster training times and higher predictive accuracy, reaching state-of-the-art
+			classification
+			results on a number of benchmark graph datasets.</p>
+
+		<h4>GCNs Part I: Definitions</h4>
+		<p>Currently, most graph neural network models have a somewhat universal architecture in common. I will refer to
+			these
+			models as <em>Graph Convolutional Networks</em> (GCNs); convolutional, because filter parameters are typically
+			shared
+			over all locations in the graph (or a subset thereof as in <d-cite key="duvenaud2015convolutional"></d-cite>).</p>
+
+		<p>For these models, the goal is then to learn a function of signals/features on a graph $\mathcal{G}=(\mathcal{V},
+			\mathcal{E})$ which takes as input:</p>
+		<ul>
+			<li>A feature description $x_i$ for every node $i$; summarized in a $N\times D$ feature matrix $X$ ($N$: number of
+				nodes, $D$: number of input features)</li>
+			<li>A representative description of the graph structure in matrix form; typically in the form of an adjacency
+				matrix $A$
+				(or some function thereof)</li>
+		</ul>
+		<p>and produces a node-level output $Z$ (an $N\times F$ feature matrix, where $F$ is the number of output features
+			per
+			node). Graph-level outputs can be modeled by introducing some form of pooling operation (see, e.g. <d-cite
+				key="duvenaud2015convolutional"></d-cite>).</p>
+
+		<p>Every neural network layer can then be written as a non-linear function $$ H^{(l+1)} = f(H^{(l)}, A) \, ,$$ with
+			$H^{(0)} = X$ and $H^{(L)} = Z$ (or $z$ for graph-level outputs), $L$ being the number of layers. The specific
+			models
+			then differ only in how $f(\cdot, \cdot)$ is chosen and parameterized.</p>
+
+		<h4>GCNs Part II: A simple example</h4>
+		<p>As an example, let's consider the following very simple form of a layer-wise propagation rule:</p>
+		<p>$$f(H^{(l)}, A) = \sigma\left( AH^{(l)}W^{(l)}\right) \, ,$$</p>
+		<p>where $W^{(l)}$ is a weight matrix for the $l$-th neural network layer and $\sigma(\cdot)$ is a non-linear
+			activation
+			function like the $\text{ReLU}$. Despite its simplicity this model is already quite powerful (we'll come to that
+			in a
+			moment).</p>
+
+		<p>But first, let us address two limitations of this simple model: multiplication with $A$ means that, for every
+			node,
+			we sum up all the feature vectors of all neighboring nodes but not the node itself (unless there are self-loops in
+			the
+			graph). We can "fix" this by enforcing self-loops in the graph: we simply add the identity matrix to $A$.</p>
+
+		<p>The second major limitation is that $A$ is typically not normalized and therefore the multiplication with $A$
+			will
+			completely change the scale of the feature vectors (we can understand that by looking at the eigenvalues of $A$).
+			Normalizing $A$ such that all rows sum to one, i.e. $D^{-1}A$, where $D$ is the diagonal node degree matrix, gets
+			rid
+			of this problem. Multiplying with $D^{-1}A$ now corresponds to taking the average of neighboring node features. In
+			practice, dynamics get more interesting when we use a symmetric normalization, i.e.
+			$D^{-\frac{1}{2}}AD^{-\frac{1}{2}}$ (as this no longer amounts to mere averaging of neighboring nodes). Combining
+			these two tricks, we essentially arrive at the propagation rule introduced in <d-cite
+				key="kipf2016semi"></d-cite>:
+		</p>
+
+		<p>$$f(H^{(l)}, A) = \sigma\left( \hat{D}^{-\frac{1}{2}}\hat{A}\hat{D}^{-\frac{1}{2}}H^{(l)}W^{(l)}\right) \, ,$$
+		</p>
+
+		<p>with $\hat{A} = A + I$, where $I$ is the identity matrix and $\hat{D}$ is the diagonal node degree matrix of
+			$\hat{A}$.</p>
+
+		<p>In the next section, we will take a closer look at how this type of model operates on a very simple example
+			graph:
+			Zachary's karate club network (make sure to check out the <a
+				href="https://en.wikipedia.org/wiki/Zachary%27s_karate_club" target="_blank">Wikipedia article</a>!).</p>
+
+		<h4 id="embedding-the-karate-club-network">GCNs Part III: Embedding the karate club network</h4>
+
+		<figure>
+			<img src="images/karate.png" alt="Karate club graph" style="width: 100%;">
+			<figcaption>Karate club graph, colors denote communities obtained via modularity-based clustering (<d-cite
+					key="brandes2008modularity"></d-cite>).</figcaption>
+		</figure>
+
+		<p>Let's take a look at how our simple GCN model (see previous section or <d-cite key="kipf2016semi"></d-cite>)
+			works on
+			a well-known graph dataset: Zachary's karate club network (see Figure above).</p>
+
+		<p>We take a 3-layer GCN with randomly initialized weights. Now, even before training the weights, we simply insert
+			the
+			adjacency matrix of the graph and $X = I$ (i.e. the identity matrix, as we don't have any node features) into the
+			model. The 3-layer GCN now performs three propagation steps during the forward pass and effectively convolves the
+			3rd-order neighborhood of every node (all nodes up to 3 "hops" away). Remarkably, the model produces an embedding
+			of
+			these nodes that closely resembles the community-structure of the graph (see Figure below). Remember that we have
+			initialized the weights completely at random and have not yet performed any training updates (so far)!</p>
+
+		<figure>
+			<img src="images/karate_emb.png" alt="GCN embedding" style="width: 100%;">
+			<figcaption>GCN embedding (with random weights) for nodes in the karate club network.</figcaption>
+		</figure>
+
+		<p>This might seem somewhat surprising. A recent paper on a model called DeepWalk (<d-cite
+				key="perozzi2014deepwalk"></d-cite>) showed that they can learn a very similar embedding in a complicated
+			unsupervised training procedure. How is it possible to get such an embedding more or less "for free" using our
+			simple
+			untrained GCN model?</p>
+
+		<p>We can shed some light on this by interpreting the GCN model as a generalized, differentiable version of the
+			well-known Weisfeiler-Lehman algorithm on graphs. The (1-dimensional) Weisfeiler-Lehman algorithm works as
+			follows<d-footnote>I'm simplifying things here. For an extensive mathematical discussion of the Weisfeiler-Lehman
+				algorithm, have a look at the paper by <d-cite key="douglas2011weisfeiler"></d-cite>.</d-footnote>:</p>
+
+		<p>For all nodes $v_i\in \mathcal{G}$:</p>
+		<ul>
+			<li>Get features<d-footnote>Node features for the Weisfeiler-Lehman algorithm are typically chosen as scalar
+					integers
+					and are often referred to as colors.</d-footnote> $\{h_{v_j}\}$ of neighboring nodes $\{v_j\}$</li>
+			<li>Update node feature $h_{v_i} \leftarrow \text{hash}\left(\sum_j h_{v_j}\right)$, where $\text{hash}(\cdot)$ is
+				(ideally) an injective hash function</li>
+		</ul>
+		<p>Repeat for $k$ steps or until convergence.</p>
+
+		<p>In practice, the Weisfeiler-Lehman algorithm assigns a unique set of features for <em>most</em> graphs. This
+			means
+			that every node is assigned a feature that uniquely describes its role in the graph. Exceptions are highly regular
+			graphs like grids, chains, etc. For most irregular graphs, this feature assignment can be used as a check for
+			graph
+			isomorphism (i.e. whether two graphs are identical, up to a permutation of the nodes).</p>
+
+		<p>Going back to our Graph Convolutional layer-wise propagation rule (now in vector form):</p>
+		<p>$$h^{(l+1)}_{v_i} = \sigma \left( \sum_{j} \frac{1}{c_{ij}}h^{(l)}_{v_j}W^{(l)} \right) \, ,$$</p>
+		<p>where $j$ indexes the neighboring nodes of $v_i$. $c_{ij}$ is a normalization constant for the edge $(v_i,v_j)$
+			which
+			originates from using the symmetrically normalized adjacency matrix $D^{-\frac{1}{2}}AD^{-\frac{1}{2}}$ in our GCN
+			model. We now see that this propagation rule can be interpreted as a differentiable and parameterized (with
+			$W^{(l)}$)
+			variant of the hash function used in the original Weisfeiler-Lehman algorithm. If we now choose an appropriate
+			non-linearity and initialize the random weight matrix such that it is orthogonal (or e.g. using the initialization
+			from <d-cite key="glorot2010understanding"></d-cite>), this update rule becomes stable in practice (also thanks to
+			the
+			normalization with $c_{ij}$). And we make the remarkable observation that we get meaningful smooth embeddings
+			where we
+			can interpret distance as (dis-)similarity of local graph structures!</p>
+
+		<h4>GCNs Part IV: Semi-supervised learning</h4>
+		<p>Since everything in our model is differentiable and parameterized, we can add some labels, train the model and
+			observe how the embeddings react. We can use the semi-supervised learning algorithm for GCNs introduced in <d-cite
+				key="kipf2016semi"></d-cite>. We simply label one node per class/community (highlighted nodes in the video
+			below)
+			and start training for a couple of iterations<d-footnote>As we don't anneal the learning rate in this example,
+				things
+				become quite "jiggly" once the model has converged to a good solution.</d-footnote>:</p>
+
+		<figure>
+			<video width='640' preload='auto' muted controls poster='images/video_.png' style="width: 100%;">
+				<source src='images/video.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+			</video>
+			<figcaption>Semi-supervised classification with GCNs: Latent space dynamics for 300 training iterations with a
+				single
+				label per class. Labeled nodes are highlighted.</figcaption>
+		</figure>
+
+		<p>Note that the model directly produces a 2-dimensional latent space which we can immediately visualize. We observe
+			that the 3-layer GCN model manages to linearly separate the communities, given only one labeled example per class.
+			This is a somewhat remarkable result, given that the model received no feature description of the nodes. At the
+			same
+			time, initial node features <em>could</em> be provided, which is exactly what we do in the experiments described
+			in
+			our paper (<d-cite key="kipf2016semi"></d-cite>) to achieve state-of-the-art classification results on a number of
+			graph datasets.</p>
+
+		<h3>Conclusion</h3>
+		<p>Research on this topic is just getting started. The past several months have seen exciting developments, but we
+			have
+			probably only scratched the surface of these types of models so far. It remains to be seen how neural networks on
+			graphs can be further taylored to specific types of problems, like, e.g., learning on directed or relational
+			graphs,
+			and how one can use learned graph embeddings for further tasks down the line, etc. This list is by no means
+			exhaustive
+			and I expect further interesting applications and extensions to pop up in the near future. Let me know in the
+			comments
+			below if you have some exciting ideas or questions to share!</p>
+		<h3>Thanks to the following people:</h3>
+		<p>Max Welling, Taco Cohen, Chris Louizos and Karen Ullrich (for many discussions and feedback both on the paper and
+			this blog post). Also I'd like to thank Ferenc Huszar for highlighting some drawbacks of these kinds of models.
+		</p>
+		<h3>A note on completeness</h3>
+		<p>This blog post constitutes by no means an exhaustive review of the field of neural networks on graphs. I have
+			left
+			out a number of both recent and older papers to make this post more readable and to give it a coherent story line.
+			The
+			papers that I mentioned here will nonetheless serve as a good start if you want to dive deeper into this topic and
+			get
+			a complete overview of what is around and what has been tried so far.</p>
+		<h3>Citation</h3>
+		<p>If you want to use some of this in your own work, you can cite our <a href="http://arxiv.org/abs/1609.02907"
+				target="_blank">paper</a> on Graph Convolutional Networks:</p>
+		<pre><code>@article{kipf2016semi,
+  title={Semi-Supervised Classification with Graph Convolutional Networks},
+  author={Kipf, Thomas N and Welling, Max},
+  journal={arXiv preprint arXiv:1609.02907},
+  year={2016}
+}</code></pre>
+		<h3>Source code</h3>
+		<p>We have released the code for Graph Convolutional Networks on GitHub: <a href="https://github.com/tkipf/gcn"
+				target="_blank">https://github.com/tkipf/gcn</a>.</p>
+		<p>You can follow me on <a href="https://twitter.com/tkipf" target="_blank">Twitter</a> for future updates.</p>
+
+	</d-article>
+
+	<d-appendix>
+		<h3 id="the-issue-with-regular-graphs">The issue with regular graphs</h3>
+		<p>In the following, I will briefly comment on the statements made in <a
+				href="http://www.inference.vc/how-powerful-are-graph-convolutions-review-of-kipf-welling-2016-2/"
+				target="_blank">How powerful are Graph Convolutions?</a>, a recent blog post by Ferenc Huszar that provides a
+			slightly negative view on some of the models discussed here. Ferenc considers the special case of regular graphs.
+			He
+			correctly points out that Graph Convolutional Networks (as introduced in this blog post) reduce to rather trivial
+			operations on regular graphs when compared to models that are specifically designed for this domain (like
+			"classical" 2D CNNs for images). It is indeed important to note that current graph neural network models that
+			apply
+			to arbitrarily structured graphs typically share some form of shortcoming when applied to regular graphs (like
+			grids, chains, fully-connected graphs etc.). A localized spectral treatment (like in <d-cite
+				key="defferrard2016convolutional"></d-cite>), for example, reduces to rotationally symmetric filters and can
+			never
+			imitate the operation of a "classical" 2D CNN on a grid (exluding border-effects). In the same way, the
+			Weisfeiler-Lehman algorithm will not converge on regular graphs. What this tells us, is that we should probably
+			look
+			beyond regular grids when trying to evaluate the usefulness of a specific graph neural network model, as there are
+			specific trade-offs that have to be made when designing such models for arbitary graphs (yet it is of course
+			important to make people aware of these trade-offs) - that is, unless we can come up with a universally powerful
+			model at some point, of course.</p>
+
+	</d-appendix>
+	<d-bibliography>
+		<script type="text/bibtex">
+@article{kipf2016semi,
+  title={Semi-Supervised Classification with Graph Convolutional Networks},
+  author={Kipf, Thomas N and Welling, Max},
+  journal={ICLR},
+  year={2017},
+  url={http://arxiv.org/abs/1609.02907}
+}
+
+@article{bruna2013spectral,
+  title={Spectral Networks and Locally Connected Networks on Graphs},
+  author={Bruna, Joan and Zaremba, Wojciech and Szlam, Arthur and LeCun, Yann},
+  journal={ICLR},
+  year={2014},
+  url={http://arxiv.org/abs/1312.6203}
+}
+
+@article{henaff2015deep,
+  title={Deep Convolutional Networks on Graph-Structured Data},
+  author={Henaff, Mikael and Bruna, Joan and LeCun, Yann},
+  journal={arXiv preprint arXiv:1506.05163},
+  year={2015},
+  url={http://arxiv.org/abs/1506.05163}
+}
+
+@inproceedings{duvenaud2015convolutional,
+  title={Convolutional Networks on Graphs for Learning Molecular Fingerprints},
+  author={Duvenaud, David K and Maclaurin, Dougal and Iparraguirre, Jorge and Bombarell, Rafael and Hirzel, Timothy and Aspuru-Guzik, Alán and Adams, Ryan P},
+  booktitle={NIPS},
+  year={2015},
+  url={http://papers.nips.cc/paper/5954-convolutional-networks-on-graphs-for-learning-molecular-fingerprints}
+}
+
+@article{li2015gated,
+  title={Gated Graph Sequence Neural Networks},
+  author={Li, Yujia and Tarlow, Daniel and Brockschmidt, Marc and Zemel, Richard},
+  journal={ICLR},
+  year={2016},
+  url={https://arxiv.org/abs/1511.05493}
+}
+
+@inproceedings{defferrard2016convolutional,
+  title={Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering},
+  author={Defferrard, Michaël and Bresson, Xavier and Vandergheynst, Pierre},
+  booktitle={NIPS},
+  year={2016},
+  url={https://arxiv.org/abs/1606.09375}
+}
+
+@inproceedings{jain2016structural,
+  title={Structural-RNN: Deep Learning on Spatio-Temporal Graphs},
+  author={Jain, Ashesh and Zamir, Amir R and Savarese, Silvio and Saxena, Ashutosh},
+  booktitle={CVPR},
+  year={2016},
+  url={https://arxiv.org/abs/1511.05298}
+}
+
+@inproceedings{perozzi2014deepwalk,
+  title={DeepWalk: Online Learning of Social Representations},
+  author={Perozzi, Bryan and Al-Rfou, Rami and Skiena, Steven},
+  booktitle={KDD},
+  year={2014},
+  url={https://arxiv.org/abs/1403.6652}
+}
+
+@article{brandes2008modularity,
+  title={On Modularity Clustering},
+  author={Brandes, Ulrik and Delling, Daniel and Gaertler, Marco and Gorke, Robert and Hoefer, Martin and Nikoloski, Zoran and Wagner, Dorothea},
+  journal={IEEE Transactions on Knowledge and Data Engineering},
+  year={2008},
+  url={http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.68.6623}
+}
+
+@article{douglas2011weisfeiler,
+  title={The Weisfeiler-Lehman Method and Graph Isomorphism Testing},
+  author={Douglas, Brendan L},
+  journal={arXiv preprint arXiv:1101.5211},
+  year={2011},
+  url={https://arxiv.org/abs/1101.5211}
+}
+
+@inproceedings{glorot2010understanding,
+  title={Understanding the difficulty of training deep feedforward neural networks},
+  author={Glorot, Xavier and Bengio, Yoshua},
+  booktitle={AISTATS},
+  year={2010},
+  url={http://jmlr.org/proceedings/papers/v9/glorot10a/glorot10a.pdf}
+}
+	</script>
+	</d-bibliography>
+
+</body>
+
+</html>
